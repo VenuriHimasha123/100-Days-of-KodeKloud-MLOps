@@ -1,0 +1,303 @@
+# Day 007 - Python Package Build and Unit Testing
+
+## Task Overview
+
+The objective of this task was to validate the fraud-detection module using unit tests and package it as an installable Python distribution. The project was located at:
+
+```
+/root/code/fraud-detection
+```
+
+The source code was already implemented. My responsibility was to:
+
+- Create unit tests.
+- Correct the packaging configuration.
+- Ensure pytest executes successfully.
+- Build a Python wheel package.
+
+---
+
+# Initial Project State
+
+The project already contained:
+
+- Source code under `src/fraud_detection/`
+- `predict.py`
+- `__init__.py`
+- A draft `pyproject.toml`
+
+The `predict()` function was already implemented as:
+
+- Return **1** if transaction amount (first feature) is greater than **100**
+- Return **0** otherwise
+
+---
+
+# Problem 1 - Incorrect pyproject.toml Configuration
+
+### Initial Configuration
+
+The project contained:
+
+```toml
+[project]
+name = "fraud-detection"
+version = "0.0.1"
+requires-python = ">=3.8"
+dependencies = []
+```
+
+### Issues
+
+Several required configurations were missing:
+
+- No `[build-system]`
+- Incorrect project name
+- Wrong version
+- Wrong Python version requirement
+- Missing dependencies
+- Missing pytest pythonpath configuration
+
+### Solution
+
+Updated the configuration to:
+
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fraud_detection"
+version = "0.1.0"
+description = "Fraud detection model for xFusionCorp Industries"
+requires-python = ">=3.10"
+dependencies = [
+    "scikit-learn",
+    "pandas",
+    "numpy"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+```
+
+This satisfied all packaging requirements.
+
+---
+
+# Problem 2 - Missing Unit Tests
+
+Initially there were no proper unit tests validating the model.
+
+### Solution
+
+Created:
+
+```
+tests/test_predict.py
+```
+
+Added two unit tests.
+
+```python
+from fraud_detection import predict
+
+
+def test_fraud_transaction():
+    data = [[150]]
+    assert predict(data) == [1]
+
+
+def test_legitimate_transaction():
+    data = [[100]]
+    assert predict(data) == [0]
+```
+
+These tests verify:
+
+- Fraud transaction (amount >100)
+- Legitimate transaction (amount <=100)
+
+---
+
+# Problem 3 - Swap File Created During Editing
+
+While creating the test file using `vi`, the editor was accidentally left without exiting properly.
+
+This created:
+
+```
+tests/.test_predict.py.swp
+```
+
+### Why It Happened
+
+The `vi` editor was interrupted before saving or exiting correctly.
+
+### Fix
+
+Removed the swap file:
+
+```bash
+rm -f tests/.test_predict.py.swp
+```
+
+Then recreated the test file correctly.
+
+---
+
+# Problem 4 - Verifying Unit Tests
+
+Executed:
+
+```bash
+pytest
+```
+
+Output:
+
+```
+==========================
+2 passed
+==========================
+```
+
+This confirmed both test cases worked correctly.
+
+---
+
+# Problem 5 - Building the Package
+
+Executed:
+
+```bash
+python3 -m build
+```
+
+The build process successfully generated:
+
+```
+dist/
+├── fraud_detection-0.1.0-py3-none-any.whl
+└── fraud_detection-0.1.0.tar.gz
+```
+
+---
+
+# Build Warning
+
+During the build process the following warning appeared:
+
+```
+warning: sdist: standard file not found:
+README
+README.md
+README.txt
+README.rst
+```
+
+### Reason
+
+The project did not contain a README file.
+
+### Resolution
+
+This was only a warning.
+
+It does **not** prevent the package from building and does not affect the task requirements.
+
+The wheel and source distribution were created successfully.
+
+---
+
+# Verification
+
+Verified unit tests:
+
+```bash
+pytest
+```
+
+Result:
+
+```
+2 passed
+```
+
+Verified package build:
+
+```bash
+python3 -m build
+```
+
+Result:
+
+```
+Successfully built
+
+fraud_detection-0.1.0.tar.gz
+fraud_detection-0.1.0-py3-none-any.whl
+```
+
+Verified build artifacts:
+
+```bash
+ls dist
+```
+
+Output:
+
+```
+fraud_detection-0.1.0-py3-none-any.whl
+fraud_detection-0.1.0.tar.gz
+```
+
+---
+
+# Commands Used
+
+```bash
+cd /root/code/fraud-detection
+
+pytest
+
+python3 -m build
+
+ls dist
+```
+
+---
+
+# Lessons Learned
+
+During this task I learned:
+
+- How to configure Python packaging using `pyproject.toml`.
+- The purpose of the `[build-system]` section.
+- How setuptools discovers packages inside the `src` directory.
+- How to configure pytest to import modules from `src`.
+- How to write simple unit tests using pytest.
+- How to validate expected outputs using assertions.
+- How to build a Python package into source and wheel distributions.
+- The difference between build warnings and build errors.
+- How to verify package creation by checking the `dist/` directory.
+
+---
+
+# Final Outcome
+
+✔ Corrected the package configuration.
+
+✔ Added unit tests.
+
+✔ Verified all tests passed.
+
+✔ Successfully built the Python wheel package.
+
+✔ Generated the required distribution files under `dist/`.
+
+Task completed successfully.
