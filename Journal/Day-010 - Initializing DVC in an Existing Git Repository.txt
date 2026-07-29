@@ -1,0 +1,329 @@
+# Day 010 - Initializing DVC in an Existing Git Repository
+
+**Challenge:** Initialize DVC for an Existing ML Project
+**Company:** xFusionCorp Industries
+**Date:** July 29, 2026
+**Status:** ✅ Completed Successfully
+
+---
+
+# 📌 Task Overview
+
+Today's task focused on setting up **Data Version Control (DVC)** for an existing Machine Learning project.
+
+The project already had a Git repository initialized, but DVC had not yet been configured.
+
+My objective was to initialize DVC, create the required DVC configuration files, and record those changes in Git.
+
+---
+
+# 🎯 Objectives
+
+The task requirements were:
+
+* Initialize DVC inside the existing Git repository.
+* Create the standard `.dvc/` directory.
+* Create the `.dvcignore` file.
+* Commit all DVC-generated files to Git.
+* Use the exact commit message:
+
+```text
+Initialize DVC
+```
+
+---
+
+# 🧠 What is DVC?
+
+**Data Version Control (DVC)** is an open-source tool designed for Machine Learning projects.
+
+Git is excellent for tracking source code, but it is not designed to efficiently manage large datasets or trained model files.
+
+DVC extends Git by allowing developers to version:
+
+* Datasets
+* Machine learning models
+* Pipelines
+* Experiments
+
+while keeping only lightweight metadata inside the Git repository.
+
+This makes collaboration easier and keeps repositories small.
+
+---
+
+# 📂 Initial Project State
+
+I navigated to the project:
+
+```bash
+cd /root/code/fraud-detection
+```
+
+Before making any changes, I verified the Git repository:
+
+```bash
+git status
+```
+
+Output:
+
+```text
+On branch master
+nothing to commit, working tree clean
+```
+
+This confirmed that the repository was clean and ready for DVC initialization.
+
+---
+
+# 🚧 Challenge
+
+At first, I was unsure whether the project already contained DVC configuration files.
+
+To verify this, I checked the Git status before running any commands.
+
+The output confirmed that:
+
+* Git was already initialized.
+* There were no pending changes.
+* DVC had not yet been initialized.
+
+---
+
+# ✅ Solution
+
+I initialized DVC using:
+
+```bash
+dvc init
+```
+
+The terminal displayed:
+
+```text
+Initialized DVC repository.
+
+You can now commit the changes to git.
+```
+
+This confirmed that DVC was successfully initialized.
+
+---
+
+# 🔍 What Changed After Initialization?
+
+After running `dvc init`, I checked the repository again:
+
+```bash
+git status
+```
+
+Git reported new files:
+
+```text
+new file: .dvc/.gitignore
+new file: .dvc/config
+new file: .dvcignore
+```
+
+These files were automatically created by DVC.
+
+---
+
+# 📁 Understanding the Generated Files
+
+## `.dvc/`
+
+This hidden directory stores DVC configuration files used to manage data versioning.
+
+### `.dvc/config`
+
+Stores project-specific DVC settings.
+
+### `.dvc/.gitignore`
+
+Prevents Git from tracking DVC cache files that should remain outside version control.
+
+---
+
+## `.dvcignore`
+
+Works similarly to `.gitignore`, but is used by DVC to ignore files and directories during data tracking.
+
+---
+
+# 💻 Commands Used
+
+Navigate to the project:
+
+```bash
+cd /root/code/fraud-detection
+```
+
+Check repository status:
+
+```bash
+git status
+```
+
+Initialize DVC:
+
+```bash
+dvc init
+```
+
+Review new files:
+
+```bash
+git status
+```
+
+Stage the DVC files:
+
+```bash
+git add .dvc .dvcignore
+```
+
+Create the required commit:
+
+```bash
+git commit -m "Initialize DVC"
+```
+
+Verify commit history:
+
+```bash
+git log --oneline -2
+```
+
+Confirm repository status:
+
+```bash
+git status
+```
+
+---
+
+# 📝 Git Commit
+
+The task required the exact commit message:
+
+```text
+Initialize DVC
+```
+
+I committed the generated DVC files using:
+
+```bash
+git commit -m "Initialize DVC"
+```
+
+---
+
+# 🔍 Verification
+
+I verified the commit history:
+
+```bash
+git log --oneline -2
+```
+
+Output:
+
+```text
+e2ea728 Initialize DVC
+c089fa6 Initial commit
+```
+
+This confirmed that the new commit had been successfully created.
+
+---
+
+I also checked the repository status:
+
+```bash
+git status
+```
+
+Output:
+
+```text
+On branch master
+nothing to commit, working tree clean
+```
+
+This confirmed that all generated files had been committed successfully.
+
+---
+
+# 📚 What I Learned
+
+Today I learned:
+
+* The purpose of Data Version Control (DVC).
+* Why Git alone is not ideal for managing datasets and trained models.
+* How to initialize DVC inside an existing Git repository.
+* Which files are automatically created by `dvc init`.
+* How DVC integrates with Git without replacing it.
+* The importance of committing configuration files after enabling DVC.
+
+---
+
+# 💡 Key Concepts
+
+### Git
+
+Tracks source code and project files.
+
+### DVC
+
+Tracks datasets, machine learning models, and experiment metadata.
+
+### `dvc init`
+
+Initializes DVC in an existing repository by creating the required configuration files.
+
+### `.dvcignore`
+
+Specifies files and directories that DVC should ignore.
+
+---
+
+# 💭 Reflection
+
+Before this task, I understood Git version control but had limited knowledge of how Machine Learning teams manage large datasets.
+
+This exercise demonstrated how DVC complements Git by providing version control for data and models while leaving source code management to Git.
+
+I also learned that enabling DVC is straightforward: initialize it, review the generated files, and commit them so the whole team shares the same DVC configuration.
+
+---
+
+# ✅ Final Result
+
+DVC was successfully initialized inside the existing Git repository.
+
+The repository now contains:
+
+* `.dvc/`
+* `.dvcignore`
+
+These files were committed with the required message:
+
+```text
+Initialize DVC
+```
+
+The repository is clean and ready for future data and model versioning.
+
+---
+
+## 🛠 Skills Practiced
+
+* Data Version Control (DVC)
+* Git
+* Repository Initialization
+* Version Control for Machine Learning
+* MLOps Fundamentals
+* Linux Command Line

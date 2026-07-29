@@ -1,0 +1,917 @@
+# Day 009 - Creating an ML Project Template with Cookiecutter
+
+**Challenge:** Cookiecutter ML Project Template
+**Company:** xFusionCorp Industries
+**Date:** July 26, 2026
+**Status:** ✅ Completed Successfully
+
+---
+
+## 📌 Task Overview
+
+Today's task focused on creating a reusable Machine Learning project template using **Cookiecutter**.
+
+The xFusionCorp Industries Machine Learning platform team maintains a Cookiecutter template that can be used to generate new ML projects with a consistent structure.
+
+The existing template was available at:
+
+```text
+/root/code/mlops-template/
+```
+
+However, the template did not satisfy all the required conditions. I had to correct the template and use it to generate a new project.
+
+The final project had to be generated at:
+
+```text
+/root/code/churn-model/
+```
+
+---
+
+## 🎯 Task Requirements
+
+The corrected Cookiecutter template needed to satisfy the following requirements:
+
+### `cookiecutter.json`
+
+It had to declare exactly four variables:
+
+* `project_name`
+* `author`
+* `python_version`
+* `ml_framework`
+
+The default values had to be:
+
+```text
+project_name: my-ml-project
+author: xFusionCorp
+python_version: 3.11
+```
+
+The `ml_framework` variable needed to provide these choices:
+
+```text
+sklearn
+pytorch
+tensorflow
+```
+
+---
+
+### Conditional Requirements
+
+The generated `requirements.txt` had to contain a different dependency depending on the selected framework:
+
+| Selected Framework | Required Package |
+| ------------------ | ---------------- |
+| sklearn            | scikit-learn     |
+| pytorch            | torch            |
+| tensorflow         | tensorflow       |
+
+---
+
+### README Requirements
+
+The generated `README.md` had to reference:
+
+* The selected `project_name`
+* The selected `author`
+
+---
+
+### Required Project Structure
+
+The template directory:
+
+```text
+{{cookiecutter.project_name}}/
+```
+
+needed to contain:
+
+### Files
+
+```text
+README.md
+requirements.txt
+```
+
+### Directories
+
+```text
+data/
+models/
+src/
+tests/
+```
+
+Finally, I had to generate:
+
+```text
+/root/code/churn-model/
+```
+
+using:
+
+```text
+project_name = churn-model
+ml_framework = sklearn
+```
+
+The generated project had to contain:
+
+```text
+scikit-learn
+```
+
+in its `requirements.txt` and mention:
+
+```text
+xFusionCorp
+```
+
+in its `README.md`.
+
+---
+
+# 📂 Initial Template Structure
+
+I first navigated to the template directory:
+
+```bash
+cd /root/code/mlops-template
+```
+
+I checked the existing structure using:
+
+```bash
+find . -maxdepth 3 -type f -o -type d
+```
+
+The existing structure was:
+
+```text
+.
+./cookiecutter.json
+./{{cookiecutter.project_name}}
+./{{cookiecutter.project_name}}/models
+./{{cookiecutter.project_name}}/models/.gitkeep
+./{{cookiecutter.project_name}}/tests
+./{{cookiecutter.project_name}}/tests/.gitkeep
+./{{cookiecutter.project_name}}/src
+./{{cookiecutter.project_name}}/src/.gitkeep
+./{{cookiecutter.project_name}}/data
+./{{cookiecutter.project_name}}/data/.gitkeep
+./{{cookiecutter.project_name}}/README.md
+./{{cookiecutter.project_name}}/requirements.txt
+```
+
+---
+
+## 🔍 First Observation
+
+The folder structure was already correct.
+
+The template already contained:
+
+```text
+{{cookiecutter.project_name}}/
+├── README.md
+├── requirements.txt
+├── data/
+├── models/
+├── src/
+└── tests/
+```
+
+Therefore, I did not need to create any new directories.
+
+The main problems were inside the configuration and template files.
+
+---
+
+# 🚧 Challenge 1 - Missing `ml_framework` Variable
+
+I checked the original `cookiecutter.json` file:
+
+```bash
+cat cookiecutter.json
+```
+
+The original content was:
+
+```json
+{
+    "project_name": "my-ml-project",
+    "author": "xFusionCorp",
+    "python_version": "3.11"
+}
+```
+
+## ❌ Problem
+
+The task required four variables, but the original file only contained three:
+
+```text
+project_name
+author
+python_version
+```
+
+The following variable was missing:
+
+```text
+ml_framework
+```
+
+Without this variable, Cookiecutter could not ask the user which machine learning framework to use.
+
+---
+
+## ✅ Solution
+
+I edited the file using:
+
+```bash
+nano cookiecutter.json
+```
+
+I added the missing variable:
+
+```json
+{
+    "project_name": "my-ml-project",
+    "author": "xFusionCorp",
+    "python_version": "3.11",
+    "ml_framework": ["sklearn", "pytorch", "tensorflow"]
+}
+```
+
+After saving the file, I verified it:
+
+```bash
+cat cookiecutter.json
+```
+
+The corrected configuration was:
+
+```json
+{
+    "project_name": "my-ml-project",
+    "author": "xFusionCorp",
+    "python_version": "3.11",
+    "ml_framework": ["sklearn", "pytorch", "tensorflow"]
+}
+```
+
+---
+
+# 🚧 Challenge 2 - Understanding Cookiecutter Choices
+
+Initially, I was unsure how to define multiple choices for `ml_framework`.
+
+I learned that when a Cookiecutter variable is defined as a list:
+
+```json
+"ml_framework": ["sklearn", "pytorch", "tensorflow"]
+```
+
+Cookiecutter presents the options interactively.
+
+When I ran the template, Cookiecutter displayed:
+
+```text
+[4/4] Select ml_framework
+    1 - sklearn
+    2 - pytorch
+    3 - tensorflow
+    Choose from [1/2/3] (1):
+```
+
+This allowed me to choose the required framework.
+
+For this task, I selected:
+
+```text
+1
+```
+
+which represented:
+
+```text
+sklearn
+```
+
+---
+
+# 🚧 Challenge 3 - Conditional Dependency Logic
+
+The next requirement was to make the generated `requirements.txt` change according to the selected framework.
+
+The required behavior was:
+
+```text
+sklearn     → scikit-learn
+pytorch     → torch
+tensorflow  → tensorflow
+```
+
+I used Jinja2 conditional logic inside the template:
+
+```jinja2
+{% if cookiecutter.ml_framework == "sklearn" %}
+scikit-learn
+{% elif cookiecutter.ml_framework == "pytorch" %}
+torch
+{% elif cookiecutter.ml_framework == "tensorflow" %}
+tensorflow
+{% endif %}
+```
+
+This is important because the file inside the template is not a normal static requirements file.
+
+It is a template.
+
+Cookiecutter evaluates the selected value and generates the correct dependency.
+
+For example:
+
+```text
+Selected framework: sklearn
+```
+
+Generated:
+
+```text
+scikit-learn
+```
+
+If the selected framework had been:
+
+```text
+pytorch
+```
+
+the generated file would contain:
+
+```text
+torch
+```
+
+And if the selected framework had been:
+
+```text
+tensorflow
+```
+
+the generated file would contain:
+
+```text
+tensorflow
+```
+
+---
+
+# 🚧 Challenge 4 - Dynamic README Content
+
+The README also needed to use values selected during project generation.
+
+The template used Cookiecutter variables:
+
+```markdown
+# {{ cookiecutter.project_name }}
+
+This machine learning project was created by {{ cookiecutter.author }}.
+
+Python version: {{ cookiecutter.python_version }}
+
+Machine Learning Framework: {{ cookiecutter.ml_framework }}
+```
+
+These values are replaced automatically when Cookiecutter generates the project.
+
+For example:
+
+```text
+project_name = churn-model
+author = xFusionCorp
+python_version = 3.11
+ml_framework = sklearn
+```
+
+becomes:
+
+```markdown
+# churn-model
+
+This machine learning project was created by xFusionCorp.
+
+Python version: 3.11
+
+Machine Learning Framework: sklearn
+```
+
+---
+
+# 🧠 Understanding Cookiecutter Variables
+
+Cookiecutter uses template variables with this syntax:
+
+```text
+{{ cookiecutter.variable_name }}
+```
+
+For example:
+
+```text
+{{ cookiecutter.project_name }}
+```
+
+is replaced with the value selected by the user.
+
+If the user enters:
+
+```text
+churn-model
+```
+
+the generated project directory becomes:
+
+```text
+churn-model
+```
+
+This allows one template to generate many different projects.
+
+For example, the same template could generate:
+
+```text
+fraud-detection/
+```
+
+or:
+
+```text
+customer-churn/
+```
+
+or:
+
+```text
+image-classification/
+```
+
+without manually recreating the project structure each time.
+
+---
+
+# 💻 Commands Used
+
+## Navigate to the template
+
+```bash
+cd /root/code/mlops-template
+```
+
+---
+
+## Check the template structure
+
+```bash
+find . -maxdepth 3 -type f -o -type d
+```
+
+---
+
+## View the Cookiecutter configuration
+
+```bash
+cat cookiecutter.json
+```
+
+---
+
+## Edit the configuration
+
+```bash
+nano cookiecutter.json
+```
+
+---
+
+## Move to the output directory
+
+```bash
+cd /root/code
+```
+
+---
+
+## Generate the project
+
+```bash
+cookiecutter /root/code/mlops-template/
+```
+
+---
+
+# ⚙️ Project Generation
+
+I ran:
+
+```bash
+cookiecutter /root/code/mlops-template/
+```
+
+Cookiecutter asked for the following values:
+
+```text
+[1/4] project_name (my-ml-project):
+```
+
+I entered:
+
+```text
+churn-model
+```
+
+For:
+
+```text
+[2/4] author (xFusionCorp):
+```
+
+I pressed:
+
+```text
+Enter
+```
+
+This kept the default value:
+
+```text
+xFusionCorp
+```
+
+For:
+
+```text
+[3/4] python_version (3.11):
+```
+
+I pressed:
+
+```text
+Enter
+```
+
+This kept:
+
+```text
+3.11
+```
+
+For the framework selection:
+
+```text
+[4/4] Select ml_framework
+    1 - sklearn
+    2 - pytorch
+    3 - tensorflow
+```
+
+I selected:
+
+```text
+1
+```
+
+This selected:
+
+```text
+sklearn
+```
+
+---
+
+# 📁 Generated Project
+
+Cookiecutter successfully generated:
+
+```text
+/root/code/churn-model/
+```
+
+I verified the generated structure using:
+
+```bash
+find /root/code/churn-model -maxdepth 2 -print
+```
+
+The result was:
+
+```text
+/root/code/churn-model
+/root/code/churn-model/models
+/root/code/churn-model/models/.gitkeep
+/root/code/churn-model/tests
+/root/code/churn-model/tests/.gitkeep
+/root/code/churn-model/src
+/root/code/churn-model/src/.gitkeep
+/root/code/churn-model/data
+/root/code/churn-model/data/.gitkeep
+/root/code/churn-model/README.md
+/root/code/churn-model/requirements.txt
+```
+
+The project structure was correct.
+
+---
+
+# 🔍 Verification of `requirements.txt`
+
+I checked the generated dependency file:
+
+```bash
+cat /root/code/churn-model/requirements.txt
+```
+
+The output was:
+
+```text
+scikit-learn
+```
+
+This confirmed that the conditional template logic worked correctly.
+
+The selected value was:
+
+```text
+ml_framework = sklearn
+```
+
+and the generated dependency was:
+
+```text
+scikit-learn
+```
+
+Therefore:
+
+```text
+sklearn → scikit-learn
+```
+
+was working correctly.
+
+---
+
+# 🔍 Verification of `README.md`
+
+I checked the generated README:
+
+```bash
+cat /root/code/churn-model/README.md
+```
+
+The output was:
+
+```markdown
+# churn-model
+
+This machine learning project was created by xFusionCorp.
+
+Python version: 3.11
+
+Machine Learning Framework: sklearn
+```
+
+This confirmed that the Cookiecutter variables were correctly replaced.
+
+The README contained:
+
+```text
+churn-model
+```
+
+from:
+
+```text
+project_name
+```
+
+and:
+
+```text
+xFusionCorp
+```
+
+from:
+
+```text
+author
+```
+
+---
+
+# 🧩 Final Template Structure
+
+The final template structure was:
+
+```text
+/root/code/mlops-template/
+│
+├── cookiecutter.json
+│
+└── {{cookiecutter.project_name}}/
+    │
+    ├── README.md
+    ├── requirements.txt
+    │
+    ├── data/
+    │   └── .gitkeep
+    │
+    ├── models/
+    │   └── .gitkeep
+    │
+    ├── src/
+    │   └── .gitkeep
+    │
+    └── tests/
+        └── .gitkeep
+```
+
+---
+
+# 🧩 Final Generated Project
+
+The generated project was:
+
+```text
+/root/code/churn-model/
+│
+├── README.md
+├── requirements.txt
+│
+├── data/
+│   └── .gitkeep
+│
+├── models/
+│   └── .gitkeep
+│
+├── src/
+│   └── .gitkeep
+│
+└── tests/
+    └── .gitkeep
+```
+
+---
+
+# 📚 What I Learned
+
+Today I learned:
+
+* How Cookiecutter can generate projects from reusable templates.
+* How to define variables in `cookiecutter.json`.
+* How to create selectable options using a list.
+* How to use Jinja2 conditional statements.
+* How to generate framework-specific dependencies automatically.
+* How to use dynamic variables inside README files.
+* How to create standardized ML project structures.
+* Why `.gitkeep` files are used in empty directories.
+* How project templates improve consistency in MLOps teams.
+
+---
+
+# 🧠 Important Concepts
+
+## Cookiecutter
+
+Cookiecutter is a project templating tool.
+
+It allows developers to create a standard project structure once and reuse it multiple times.
+
+---
+
+## `cookiecutter.json`
+
+This file defines the variables that users can customize when generating a project.
+
+Example:
+
+```json
+{
+    "project_name": "my-ml-project",
+    "author": "xFusionCorp",
+    "python_version": "3.11",
+    "ml_framework": ["sklearn", "pytorch", "tensorflow"]
+}
+```
+
+---
+
+## Jinja2 Variables
+
+This:
+
+```text
+{{ cookiecutter.project_name }}
+```
+
+is replaced by the selected project name.
+
+---
+
+## Jinja2 Conditional Logic
+
+This:
+
+```jinja2
+{% if cookiecutter.ml_framework == "sklearn" %}
+scikit-learn
+{% elif cookiecutter.ml_framework == "pytorch" %}
+torch
+{% elif cookiecutter.ml_framework == "tensorflow" %}
+tensorflow
+{% endif %}
+```
+
+allows the generated content to change based on the selected framework.
+
+---
+
+# 💭 Reflection
+
+Initially, I thought the task was simply about creating a few folders and files.
+
+However, I learned that the main purpose was to create a reusable project generation system.
+
+The most challenging part was understanding that the files inside the template are not always static files. They can contain variables and conditional logic that are evaluated during project generation.
+
+I also learned that one Cookiecutter template can be reused to create different types of Machine Learning projects.
+
+For example, the same template could generate projects for:
+
+* Scikit-learn
+* PyTorch
+* TensorFlow
+
+while automatically generating the correct dependency file.
+
+This is useful in real-world MLOps environments because teams can maintain consistent project structures while still allowing project-specific customization.
+
+---
+
+# 🎯 Final Result
+
+The Cookiecutter template was successfully corrected and used to generate a new ML project.
+
+### Template:
+
+```text
+/root/code/mlops-template/
+```
+
+### Generated Project:
+
+```text
+/root/code/churn-model/
+```
+
+### Selected Framework:
+
+```text
+sklearn
+```
+
+### Generated Dependency:
+
+```text
+scikit-learn
+```
+
+### Author:
+
+```text
+xFusionCorp
+```
+
+---
+
+## ✅ Task Status
+
+**COMPLETED SUCCESSFULLY** 🎉
+
+### Skills Practiced
+
+* Cookiecutter
+* Jinja2
+* Python Project Templates
+* MLOps Project Standardization
+* Conditional Dependency Generation
+* Linux Commands
+* Project Structure Design
+* Template-Based Automation

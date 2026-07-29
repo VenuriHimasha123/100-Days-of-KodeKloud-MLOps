@@ -1,0 +1,301 @@
+# Day 008 - Pre-commit Code Quality Automation
+
+## Task Overview
+
+The xFusionCorp Industries ML team uses pre-commit to enforce code quality standards before every commit.
+
+The project was located at:
+
+/root/code/fraud-detection/
+
+The repository already contained:
+
+- .pre-commit-config.yaml
+- process.py
+- A Git repository
+
+The objective was to correct the pre-commit configuration, register the Git hooks, and ensure all configured checks passed successfully.
+
+---
+
+## Initial Problem
+
+The initial .pre-commit-config.yaml file was incomplete and did not fully follow the team's standards.
+
+The original configuration included:
+
+- pre-commit hooks
+- an outdated Ruff repository
+- an incomplete Black configuration
+
+Some hook IDs and repository revisions also needed to be updated.
+
+---
+
+## Required Hooks
+
+The final configuration needed to include five hooks:
+
+1. trailing-whitespace
+2. end-of-file-fixer
+3. check-yaml
+4. ruff
+5. black
+
+The configuration also required every repository entry to contain a rev: field.
+
+---
+
+## Corrected Configuration
+
+The final .pre-commit-config.yaml configuration was:
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.22
+    hooks:
+      - id: ruff
+
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 26.5.1
+    hooks:
+      - id: black
+
+---
+
+## Updating Repository Versions
+
+The command below was used to automatically check and update the repository revisions:
+
+pre-commit autoupdate
+
+The command updated the Ruff and Black versions:
+
+Ruff:
+
+v0.12.3 -> v0.15.22
+
+Black:
+
+25.1.0 -> 26.5.1
+
+The pre-commit-hooks repository was already up to date.
+
+This demonstrated how pre-commit can automatically discover and update repository versions to current released tags.
+
+---
+
+## Registering the Git Hook
+
+The pre-commit hook was installed using:
+
+pre-commit install
+
+Output:
+
+pre-commit installed at .git/hooks/pre-commit
+
+This registered pre-commit with Git so that the configured checks can run automatically during commits.
+
+---
+
+## First Execution
+
+The following command was used:
+
+pre-commit run --all-files
+
+During the first run, the trailing-whitespace hook failed because it found whitespace in process.py.
+
+Output:
+
+trim trailing whitespace.................................Failed
+
+- files were modified by this hook
+
+Fixing process.py
+
+This was not a permanent failure. The hook automatically fixed the whitespace problem in process.py.
+
+The other hooks passed:
+
+- end-of-file-fixer: Passed
+- check-yaml: Passed
+- Ruff: Passed
+- Black: Passed
+
+---
+
+## Second Execution
+
+The command was executed again:
+
+pre-commit run --all-files
+
+This time, all hooks passed successfully:
+
+trim trailing whitespace.................................Passed
+
+fix end of files.........................................Passed
+
+check yaml...............................................Passed
+
+ruff.....................................................Passed
+
+black....................................................Passed
+
+---
+
+## Final Verification
+
+The pre-commit checks were run multiple times to confirm that the files were clean:
+
+pre-commit run --all-files
+
+Final result:
+
+- trailing-whitespace: Passed
+- end-of-file-fixer: Passed
+- check-yaml: Passed
+- ruff: Passed
+- black: Passed
+
+---
+
+## Git Status
+
+After running the checks, Git showed modifications to:
+
+- .pre-commit-config.yaml
+- process.py
+
+The configuration file was modified because the repository revisions were updated using pre-commit autoupdate.
+
+The process.py file was modified automatically by the trailing-whitespace hook.
+
+---
+
+## Problems Encountered and Solutions
+
+### Problem 1: Outdated Ruff Configuration
+
+The initial Ruff repository was:
+
+https://github.com/charliermarsh/ruff-pre-commit
+
+Solution:
+
+Changed it to the official repository:
+
+https://github.com/astral-sh/ruff-pre-commit
+
+---
+
+### Problem 2: Missing Black Revision
+
+The initial Black repository did not contain a rev: field.
+
+Solution:
+
+Used pre-commit autoupdate to automatically discover and add a current released revision.
+
+---
+
+### Problem 3: Incorrect Hook ID
+
+The initial YAML configuration used:
+
+check_yaml
+
+The correct hook ID is:
+
+check-yaml
+
+The hook ID was corrected.
+
+---
+
+### Problem 4: Trailing Whitespace in process.py
+
+The first execution detected trailing whitespace and automatically modified process.py.
+
+Solution:
+
+The pre-commit hook automatically fixed the issue.
+
+The checks were then run again.
+
+---
+
+## Final Outcome
+
+The task was completed successfully.
+
+The final configuration:
+
+- Includes all five required hooks.
+- Uses the correct repositories.
+- Contains a rev: field for every repository.
+- Uses current released versions.
+- Is registered with Git.
+- Passes pre-commit run --all-files successfully.
+
+---
+
+## Key Lessons Learned
+
+Through this task, I learned:
+
+- How pre-commit automates code quality checks.
+- How to configure multiple pre-commit repositories.
+- The importance of pinning repository versions using rev:.
+- How to use pre-commit autoupdate.
+- How to register pre-commit hooks with Git.
+- How pre-commit automatically fixes some code quality issues.
+- The difference between a hook failing because it fixed files and a genuine validation failure.
+- Why pre-commit should be run again after automatic modifications.
+
+---
+
+## Useful Commands
+
+Navigate to the project:
+
+cd /root/code/fraud-detection
+
+Update hook versions:
+
+pre-commit autoupdate
+
+Install Git hooks:
+
+pre-commit install
+
+Run all hooks:
+
+pre-commit run --all-files
+
+Check repository status:
+
+git status
+
+---
+
+## Final Status
+
+Task 8 completed successfully.
+
+All five pre-commit hooks passed:
+
+[PASS] trailing-whitespace
+[PASS] end-of-file-fixer
+[PASS] check-yaml
+[PASS] ruff
+[PASS] black
